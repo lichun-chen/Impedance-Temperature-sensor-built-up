@@ -7,12 +7,10 @@
 #include<math.h> // for math functions
 #include<Wire.h> // for I2C communications
 #include<Arduino.h> // For access to hardware pins
-//#include<HardwareSerial.h> // for Serial Logging
 
 #define LOGGING1 0 // Basic Log, Error
 #define LOGGING2 0 // Related to Development Phase
 #define LOGGING3 0 // Detailed Log for Debugging
-// Caution! Currently, verbose logging feature makes problem. Do not use them before proper debugging.
 
 const int AD5933_ADR = 0x0D; // Device Serial Bus Address
 const int BLOCK_READ_CODE = 0xA1; // Command Code for block read.
@@ -33,9 +31,6 @@ const int RANGE_4 = 4;
 const int GAIN_1 = 1; // constants for PGA gain inside
 const int GAIN_5 = 5;
 
-/*
-The constants below is for Henway circuits and designed by Adetunji Dahunsi.
-*/
 const int LED7_R = 3;
 const int LED7_G = 4;
 const int LED7_B = 5;
@@ -49,21 +44,15 @@ const int BOOST = 22; // 5V On
 const int BI_TETRA_MUX = 29; // Bi-Polar / Tetra-polar multiplexer switch
 const int IV_MUX = 23; // Current / Voltage multiplexer switch
 
-// End of Henway Constants
-
-//const double M_PI = 3.14159265358979323846;	// pi
-//const double M_PI_2 = 1.57079632679489661923;	// pi/2
-
 typedef uint8_t byte; // For the compatibility for Arduino Type Definitions
 
 class AD5933_Class
 {
 public: // The detailed instruction will be on ".cpp" file comments.
-		// Wiki on Github includes out-of-dated instructions, but it could be a good reference. (Will be updated if time allows.)
 		
 	int delayTimeInit; // for setting delay time.
 
-	// Common functions used within a sketch
+	// Common functions used
 
 	double getTemperature();
   int getByte(int);
@@ -141,18 +130,10 @@ private:	// Internal fucntions and variables used within the library
 	//int getImagCompP();
 	byte numIncrement;						// Internal Variable for value of # of increment
 	double getMagValue();
-	
-	/*
-	*	Inline Function for getting status register.
-	*/
 		
 	HardwareSerial *printer; // Decleared for Logging Feature (Not actually used)
 	
 	//bool blockRead(int, int, byte *);
-	
-	/*
-	* 	Inline Function for getting root squared magnitude from two integer value
-	*/
 
 	bool isValueReady();
 
