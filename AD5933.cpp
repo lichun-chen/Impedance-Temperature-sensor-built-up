@@ -36,9 +36,7 @@ double AD5933_Class::getTemperature() {
 	return cTemp;
 }
 
-/*
- * Updates temperature information without writing to a variable.
- */
+// Updates temperature information without writing to a variable.
 
 bool AD5933_Class::tempUpdate() {
 
@@ -58,9 +56,7 @@ bool AD5933_Class::tempUpdate() {
 	return true;
 }
 
-/**
- * Sets the Reset Bit (D4) in control register 0x81. Place the AD5933 into the standby mode
- */
+//Sets the Reset Bit (D4) in control register 0x81. Place the AD5933 into the standby mode
 
 bool AD5933_Class::resetAD5933() {
 
@@ -70,12 +66,8 @@ bool AD5933_Class::resetAD5933() {
   /* a|b运算, a,b均转换为二进制之后，“|”(即“或”)表示对应位有一个为1就为1 */
 }
 
-/**
- * A function to enable/disable external clock.
- * This function also sets the environmental variable (double opClock)
- * @Param swt True uses an external clook.
- */
-
+//A function to enable/disable external clock.
+// This function also sets the environmental variable (double opClock)
 bool AD5933_Class::setExtClock(bool swt) {
 	byte t1;
 	if ( swt )
@@ -93,8 +85,8 @@ bool AD5933_Class::setExtClock(bool swt) {
 
 /**
  * Sets the number of settling cycles before a measurement is taken.
- * @Param cycles Cycles to ignore before a measurement is taken. Max is 511.
- * @Param mult Multiplier for cycles. Can be 1, 2, or 4.
+ * Cycles to ignore before a measurement is taken. Max is 511.
+ * Multiplier for cycles. Can be 1, 2, or 4.
  */
 //Write in Number of setting time cycles register
 bool AD5933_Class::setSettlingCycles(int cycles, byte mult) 
@@ -110,24 +102,6 @@ bool AD5933_Class::setSettlingCycles(int cycles, byte mult)
 	int lowerHex = cycles % 256;//取转换为二进制后的后8位
 	int upperHex = ((cycles - (long)lowerHex) >> 8) % 2;//get value of D8
 	byte t1; // Parsing upper and lower bits. Byte has 8 bits
-	/*switch(mult)
-    {
-      case 1:
-        t1 = 0;
-        break;
-      case 2:
-        t1 = 1;
-        break;
-      case 4:
-        t1 = 3;
-        break;
-      default:
-  #if LOGGING1
-      printer->println("setSettlingCycles - Invalid Mult Parameter");
-  #endif
-      return false;
-      break;
-    }*/
 	t1--; // Enhanced Code for setting t1. To make t1 has 7 bits 
 	upperHex |= (t1 << 1);  // t1 is for D9, D10. The upperHex just accounts for D8. Thus, the value after left-shifting t1 accounts for D9, D10.
 	// Thus, this above writes bits for D9, D10.
@@ -150,11 +124,7 @@ bool AD5933_Class::setSettlingCycles(int cycles, byte mult)
 }
 
 
-/**
- * Sets the start frequency for a frequency sweep in hertz.
- *
- * @Param startFreq The start frequency
- */
+//Sets the start frequency for a frequency sweep in hertz.
 bool AD5933_Class::setStartFreq(long startFreq) {
 
 #if LOGGING3
@@ -203,15 +173,7 @@ bool AD5933_Class::setStartFreq(long startFreq) {
 	}
 }
 
-/**
- * Sets the step size for a frequency sweep in hertz.
- *
- * NOTE: because the increment frequency should be converted into unique hexadecimal number,
- * it approximately calculates the Hex value.
- *
- * @Param increment The stepSize in hertz
- */
-
+//Sets the step size for a frequency sweep in hertz.
 bool AD5933_Class::setStepSize(long increment) {
 
 	long freqHex = increment / (opClock / pow(2, 29)); // Based on the data sheet.
@@ -254,15 +216,7 @@ bool AD5933_Class::setStepSizeInHex(long freqHex) {
 
 }
 
-/**
- * Sets the number of frequency increments in a frequency sweep. The AD5933 is rated for 1 - 100 KHZ.
- * You may go higher at the risk of larger errors.
- *
- * NOTE: This is the number of increments, not the total number of points in the sweep. An Increment of 5
- * means a total of 6 frequency points.
- *
- * @Param num Number of increments
- */
+//Sets the number of frequency increments in a frequency sweep. The AD5933 is rated for 1 - 100 KHZ.
 
 bool AD5933_Class::setNumofIncrement(byte num) {
 
@@ -294,28 +248,12 @@ bool AD5933_Class::setNumofIncrement(byte num) {
 	}
 }
 
-/**
- * Changes the value of the excitation volatage at the transmit (output) stage of the AD5933 to one of the 4 selectable ranges.
- *
- * The contents if the control register remain the same with the exception of the bits determining
- * the output range.
- *
- * @Param rangeToSet Values of 1 - 4, for each excitation range respectively.
- */
+//Changes the value of the excitation volatage at the transmit (output) stage of the AD5933 to one of the 4 selectable ranges.
 
 bool AD5933_Class::setRange(byte rangeToSet) {
 	return setRange(rangeToSet, getByte(0x80));
 }
 
-/**
- * Changes the value of the excitation volatage at the transmit (output) stage of the AD5933 to one of the 4 selectable ranges.
- *
- * This function also lets you overwrite the contents of the remaining bits in the control register with
- * values of your choosing.
- *
- * @Param rangeToSet Values of 1 - 4, for each excitation range respectively.
- * @Param ctrReg The new contents of the control resister to overwrite prior to bit shifting.
- */
 // set range no. in control register 0x80
 bool AD5933_Class::setRange(byte rangeToSet, int ctrReg) {
 
@@ -353,28 +291,12 @@ bool AD5933_Class::setRange(byte rangeToSet, int ctrReg) {
 
 }
 
-/**
- * Changes the value of the gain at the recieve (input) stage of the AD5933 to one of the 2 selectable gains.
- *
- * The contents if the control register remain the same with the exception of the single bit determining
- * the gain.
- *
- * @Param pgaGain Values of 1 or 5, for each gain respectively.
- */
+//Changes the value of the gain at the recieve (input) stage of the AD5933 to one of the 2 selectable gains.
 
 bool AD5933_Class::setPGA(byte pgaGain){
 	return setPGA(pgaGain, getByte(0x80));
 }
 
-/**
- * Changes the value of the gain at the recieve (input) stage of the AD5933 to one of the 2 selectable gains.
- *
- * This function also lets you overwrite the contents of the remaining bits in the control register with
- * values of your choosing.
- *
- * @Param pgaGain Values of 1 or 5, for each gain respectively.
- * @Param ctrReg The new contents of the control resister to overwrite prior to bit shifting.
- */
 //set the PGA Gain
 bool AD5933_Class::setPGA(byte pgaGain, int ctrReg) {
 
@@ -407,35 +329,13 @@ bool AD5933_Class::setPGA(byte pgaGain, int ctrReg) {
 
 }
 
-/**
- * Calculates a single gain factor for a single frequency in bi-polar mode. The AD5933 for consecutive measurements must
- * set the control mode to repeat frequency for accurate measurements. (setCtrMode(REPEAT_FREQ)
- * The AD5933 will automatically eneter standby mode after this, for the alternative see:
- *
- * 	bool getGainFactor(double, int, double &, double &, bool);
- *
- *
- * @Param cResistance The calibration resistance
- * @Param avgNum The number 
- times each gain factor should be measured, and then averaged by.
- * @Param gainFactor The double into which the gain factor is saved
- * @Param pShift The array into which the system phase shift is saved
- */
-
+// Calculates a single gain factor for a single frequency in bi-polar mode. The AD5933 for consecutive measurements must
+// set the control mode to repeat frequency for accurate measurements. (setCtrMode(REPEAT_FREQ)
+ 
 bool AD5933_Class::getGainFactor(double cResistance, int avgNum, double &gainFactor, double &pShift) {
 	return getGainFactor(cResistance, avgNum, gainFactor, pShift, true);
 }
 
-/**
- * Calculates a single gain factor for a single frequency in bi-polar mode. The AD5933 for consecutive measurements must
- * set the control mode to repeat frequency for accurate measurements. (setCtrMode(REPEAT_FREQ)
- *
- * @Param cResistance The calibration resistance
- * @Param avgNum The number of times each gain factor should be measured, and then averaged by.
- * @Param gainFactor The double into which the gain factor is saved
- * @Param pShift The array into which the system phase shift is saved
- * @Param retStandBy A boolean instructing the AD5933 to enter standby mode待机模式 after calculation or not.
- */
 bool AD5933_Class::getGainFactor(double cResistance, int avgNum, double &gainFactor, double &pShift, bool retStandBy) {
 
 	int ctrReg = getByte(0x80); // Get the content of Control Register and put it into ctrReg
@@ -484,34 +384,12 @@ bool AD5933_Class::getGainFactor(double cResistance, int avgNum, double &gainFac
 	return true;
 }
 
-/**
- * Calculates a single gain factor for a single frequency in tetra-polar mode. The AD5933 for consecutive measurements must
- * set thr control mode to repeat frequency for accurate measurements. (setCtrMode(REPEAT_FREQ)
- * The AD5933 will automatically eneter standby mode after this, for the alternative see:
- *
- * 	bool getGainFactorTetra(double, int, double &, double &, double &, bool);
- *
- *
- * @Param cResistance The calibration resistance
- * @Param avgNum The number of times each gain factor should be measured, and then averaged by.
- * @Param gainFactor The double into which the gain factor is saved
- * @Param pShift The array into which the system phase shift is saved
- */
+// Calculates a single gain factor for a single frequency in tetra-polar mode. The AD5933 for consecutive measurements must
+// set thr control mode to repeat frequency for accurate measurements. (setCtrMode(REPEAT_FREQ)
 
 bool AD5933_Class::getGainFactorTetra(double calResistance, int avgNum, double &gainFactor, double &vPShift, double &iPShift) {
 	return getGainFactorTetra(calResistance, avgNum, gainFactor, vPShift, iPShift, true);
 }
-
-/**
- * Calculates a single gain factor for a single frequency in tetra-polar mode. The AD5933 for consecutive measurements must
- * set thr control mode to repeat frequency for accurate measurements. (setCtrMode(REPEAT_FREQ)
- *
- * @Param cResistance The calibration resistance
- * @Param avgNum The number of times each gain factor should be measured, and then averaged by.
- * @Param gainFactor The double into which the gain factor is saved
- * @Param pShift The array into which the system phase shift is saved
- * @Param retStandBy A boolean instructing the AD5933 to enter standby mode after calculation or not.
- */
 
 bool AD5933_Class::getGainFactorTetra(double calResistance, int avgNum, double &gainFactor, double &vPShift, double &iPShift, bool retStandBy){
 
@@ -598,15 +476,7 @@ bool AD5933_Class::getGainFactorTetra(double calResistance, int avgNum, double &
 	return true;
 }
 
-/**
- * Calculates the gain factors and system phase shift for each step in a predefined frequency sweep for the AD5933 in a bi-polar configuration
- *
- * @Param cResistance The calibration resistance
- * @Param avgNum The number of times each gain factor should be measured, and then averaged by.
- * @Param gainFactorArr The array into which the gain factors are saved
- * @Param pShiftArr The array into which the system phase shifts are saved
- */
-
+// Calculates the gain factors and system phase shift for each step in a predefined frequency sweep for the AD5933 in a bi-polar configuration
 bool AD5933_Class::getGainFactorsSweep(double cResistance, int avgNum, double *gainFactorArr, double *pShiftArr) {
 	int ctrReg = getByte(0x80);
 	if (setCtrMode(STAND_BY, ctrReg) == false)
@@ -655,16 +525,7 @@ bool AD5933_Class::getGainFactorsSweep(double cResistance, int avgNum, double *g
 	return true; // Succeed!
 }
 
-/**
- * Calculates the gain factors and system phase shift for each step in a predrfined frequency sweep for the AD5933 in a tetra-polar configuration
- *
- * @Param cResistance The calibration resistance
- * @Param avgNum The number of times each gain factor should be measured, and then averaged by.
- * @Param gainFactorArr The array into which the gain factors are saved
- * @Param vShiftArr The array into which the system voltage phase shifts are saved
- * @Param cShiftArr The array into which the system current phase shifts are saved
- */
-
+// Calculates the gain factors and system phase shift for each step in a predrfined frequency sweep for the AD5933 in a tetra-polar configuration
 bool AD5933_Class::getGainFactorsTetraSweep(double cResistance, int avgNum, double *gainFactorArr, double *vShiftArr, double *cShiftArr){
 
 	int ctrReg = getByte(0x80);
@@ -758,13 +619,7 @@ bool AD5933_Class::getGainFactorsTetraSweep(double cResistance, int avgNum, doub
 	return true; // Succeed!
 }
 
-/*
- * Gets the raw values of the DFT from the AD5933 after calculation
- *
- * @Param realComp The real component of the DFT
- * @Param imagComp The imaginary component of the DFT
- */
-
+// Gets the raw values of the DFT from the AD5933 after calculation
 bool AD5933_Class::getComplexRawOnce(int &realComp, int &imagComp) {
 
 	while ( (getStatusReg() & 0x02) != 0x02 ); // Wait until measurement is complete.
@@ -786,15 +641,7 @@ bool AD5933_Class::getComplexRawOnce(int &realComp, int &imagComp) {
 	return true;
 }
 
-/*
- * Gets the impedance magnitude and phase angle for the AD5933 in a bi-polar configuration.
- *
- * @Param gainFactor The gainfactor caluclulated at calibration
- * @Param pShift The system phase shift calculated at calibration
- * @Param impVal The magnitude of the impedance
- * @Param phase The phase angle of the impedance
- */
-
+//Gets the impedance magnitude and phase angle for the AD5933 in a bi-polar configuration.
 bool AD5933_Class::getComplex(double gainFactor, double pShift, double &impVal, double &phase) {
 	while ( (getStatusReg() & 0x02) != 0x02 ); // Wait until measurement is complete.
 
@@ -812,13 +659,7 @@ bool AD5933_Class::getComplex(double gainFactor, double pShift, double &impVal, 
 	return true;
 }
 
-/*
- * Gets the impedance magnitude for the AD5933 in a bi-polar configuration.
- *
- * @Param gainFactor The gainfactor caluclulated at calibration
- * @Param impVal The magnitude of the impedance
- */
-
+// Gets the impedance magnitude for the AD5933 in a bi-polar configuration.
 bool AD5933_Class::getImpedance(double gainFactor, double &impVal) {
 	while ( (getStatusReg() & 0x02) != 0x02 ); // Wait until measurement is complete.
 
@@ -835,15 +676,7 @@ bool AD5933_Class::getImpedance(double gainFactor, double &impVal) {
 }
 
 
-/*
- * Gets the impedance magnitude and phase angle for the AD5933 in a tetra-polar configuration.
- *
- * @Param gainFactor The gainfactor caluclulated at calibration
- * @Param vPhaseShift The system voltage phase shift calculated at calibration
- * @Param iPhaseShift The system current phase shift calculated at calibration
- * @Param impVal The magnitude of the impedance
- * @Param phase The phase angle of the impedance
- */
+// Gets the impedance magnitude and phase angle for the AD5933 in a tetra-polar configuration.
 bool AD5933_Class::getComplexTetra(int millisDelay, double gainFactor, double vPhaseShift, double iPhaseShift, double &impVal, double &phase) {
 
 	int rVoltage, iVoltage, rCurrent, iCurrent;
@@ -872,25 +705,12 @@ bool AD5933_Class::getComplexTetra(int millisDelay, double gainFactor, double vP
 	return true;
 }
 
-/**
- * Sends a command instruction to the control register without assumming the contents of the
- * control register.
- *
- * @Param modetoSet One of the available commands to send to control register of the AD5933
- */
-
+// Sends a command instruction to the control register without assumming the contents of the
+// control register.
 bool AD5933_Class::setCtrMode(byte modetoSet) {
 	return setCtrMode(modetoSet, getByte(0x80));
 }
 
-/**
- * Sends a command instruction to the control register with an explicit integer detailing the contents
- * of the control register. If this integer doesn't match what the control register already contains,
- * the previous bits in the register will be overwritten with this one.
- *
- * @Param modetoSet One of the available commands to send to control register of the AD5933
- * @Param ctrReg The new contents of the control resister to overwrite prior to bit shifting.
- */
 bool AD5933_Class::setCtrMode(byte modetoSet, int ctrReg) {
 
 	ctrReg &= 0x0F; // Get the last 4 digits. 0x0F=1111. '&=' 转换为二进制后进行按位“AND”操作
@@ -925,13 +745,7 @@ bool AD5933_Class::setCtrMode(byte modetoSet, int ctrReg) {
 
 }
 
-/*
- * Hidden Function to get the contents of a register address via I2C.
- * Returns retrived byte data.
- *
- * @Param address The I2C register address to query
- */
-
+//Hidden Function to get the contents of a register address via I2C.
 int AD5933_Class::getByte(int address) {
 
 	int rxByte;
@@ -978,12 +792,8 @@ int AD5933_Class::getByte(int address) {
 
 }
 
-/*
- * Hidden Function to write values to an I2C address.
- * @Param address The I2C register address to write to
- * @Param value The value to write
- */
 
+// Hidden Function to write values to an I2C address
 bool AD5933_Class::setByte(int address, int value) // variables are "address & value" OR "command code & address"
 {
 	Wire.beginTransmission(AD5933_ADR); // Begin I2C Transmission.
@@ -1001,10 +811,7 @@ bool AD5933_Class::setByte(int address, int value) // variables are "address & v
 	}
 }
 
-/*
- * Hidden Function to get magnitude value of impedance measurement. (It does not wait.)
- * Returns the magnitude of impedance value
- */
+// Hidden Function to get magnitude value of impedance measurement. (It does not wait.)
 double AD5933_Class::getMagValue() {
 	
 	int rComp, iComp;
@@ -1022,10 +829,7 @@ double AD5933_Class::getMagValue() {
 	return result;
 }
 
-/*
- * Wrapper Function of getMagValue. It waits until the ADC completes the conversion.
- *
- */
+// Wrapper Function of getMagValue. It waits until the ADC completes the conversion.
 double AD5933_Class::getMagOnce()
 {
 	while (!isValueReady()) // wait until ADC conversion is complete.
@@ -1036,17 +840,7 @@ double AD5933_Class::getMagOnce()
 	return getMagValue();
 }
 
-/*
- * Reads a block of data from the AD5933
- * Implemented for Block Access with reading multiple bytes in once as optimization
- *
- * Returns false when failed. Returns true when succeed.
- *
- * @Param address The address of the AD5933
- * @Param num2Read The number of values to read
- * @Param toSave The byte array the values read are saved to
- */
-
+// Reads a block of data from the AD5933
 bool AD5933_Class::blockRead(int address, int num2Read, byte *toSave)
 {
 	if ( !AD5933.setByte(Address_Ptr, address) )
@@ -1079,11 +873,7 @@ bool AD5933_Class::blockRead(int address, int num2Read, byte *toSave)
 	return true;
 }
 
-/*
- * Checks if the AD5933 has completed it's DFT algorithm and the results are present in the registers.
- * It is private function. It should not be used outside of the program.
- */
-
+// Checks if the AD5933 has completed it's DFT algorithm and the results are present in the registers.
 bool AD5933_Class::isValueReady()
 {
 	if ( (getStatusReg() & 0x02) == 0x02 )
@@ -1092,52 +882,4 @@ bool AD5933_Class::isValueReady()
 		return false;
 }
 
-/*
- * Used to set I/O pins for custom AD5933 PCB (Tetrapolar, made by Henway)
- * Programmed by Adetunji Dahunsi
- * Designed for Henway Tetrapolar Custom AD5933 PCB Circuit
- *
- * @Param state Configure the AD5933 in bi-polar or tetra polar mode (LOW - TETRA, HIGH - BI)
- *
- */
 
-bool AD5933_Class::setupDevicePins(int state) {
-
-	pinMode(LED5, OUTPUT);
-	pinMode(LED6, OUTPUT);
-	pinMode(LED7_R, OUTPUT);
-	pinMode(LED7_G, OUTPUT);
-	pinMode(LED7_B, OUTPUT);
-	pinMode(LED8, OUTPUT);
-
-	pinMode(BOOST, OUTPUT);
-	pinMode(IV_MUX, OUTPUT);
-	pinMode(BI_TETRA_MUX, OUTPUT);
-
-	pinMode(PUSH1, INPUT);
-	pinMode(PUSH2, INPUT);
-
-	pinMode(25, INPUT);
-	pinMode(24, INPUT);
-
-	int leds[6] = {LED5, LED6, LED7_R, LED7_G, LED7_B, LED8};
-
-	//All leds off
-	for(int i = 0; i < 6; i++) {
-		digitalWrite(leds[i], HIGH);
-	}
-
-	digitalWrite(BOOST, HIGH);
-
-	switch(state) {
-
-	case LOW:
-		digitalWrite(BI_TETRA_MUX, LOW); // Set AD5933 to tetra-polar mode
-		return true;
-	case HIGH:
-		digitalWrite(BI_TETRA_MUX, HIGH); // Set AD5933 to tetra-polar mode
-		return true;
-	default:
-		return false;
-	}
-}
