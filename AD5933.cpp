@@ -4,6 +4,66 @@
 
 AD5933_Class AD5933;
 
+//Function to get the contents of a register address via I2C
+int AD5933_Class::getByte(int address) {
+
+  int rxByte;
+
+  if ( !setByte(Address_Ptr, address))
+    return false;
+  Wire.requestFrom(AD5933_ADR, 1); // Request the value of the written address.
+
+  if (1 <= Wire.available()) { // If the MCU get the value,
+    rxByte = Wire.read(); // Read the value.
+  }
+  else {
+    rxByte = -1; // Returns -1 if fails.
+  }
+  return rxByte;
+}
+
+// Function to write values to an I2C address
+bool AD5933_Class::setByte(int address, int value) // variables are "address & value" OR "command code & address"
+{
+  Wire.beginTransmission(AD5933_ADR); // Begin I2C Transmission.
+  Wire.write(address); // Write Address
+  Wire.write(value); // Write Value
+  int i2cReturn = Wire.endTransmission(); // Terminate the transmission.
+
+  if (i2cReturn)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}
+
+// Reads a block of data from the AD5933
+bool AD5933_Class::blockRead(int address, int num2Read, byte *toSave)
+{
+  if ( !AD5933.setByte(Address_Ptr, address) )
+    return false;
+  if ( !AD5933.setByte(BLOCK_READ_CODE, num2Read) )
+    return false;
+
+  for (byte t1 = 0; t1 < num2Read; t1++)
+  {
+    Wire.requestFrom(AD5933_ADR, 1); // Request the value of the written address.
+
+    if (1 <= Wire.available()) { // If the MCU get the value,
+      toSave[t1] = Wire.read(); // Read the value.
+    }
+    else {
+      toSave[t1] = -1; // Returns -1 if fails.
+      return false;
+
+    }
+  }
+  return true;
+}
+
 //Gets the temperature of the AD5933
 double AD5933_Class::getTemperature() {
 
@@ -276,64 +336,4 @@ bool AD5933_Class::setCtrMode(byte modetoSet, int ctrReg) {
 	}
 	return setByte(0x80, ctrReg); // return signal depends on the result of setting control register.
 
-}
-
-//Function to get the contents of a register address via I2C
-int AD5933_Class::getByte(int address) {
-
-	int rxByte;
-
-	if ( !setByte(Address_Ptr, address))
-		return false;
-	Wire.requestFrom(AD5933_ADR, 1); // Request the value of the written address.
-
-	if (1 <= Wire.available()) { // If the MCU get the value,
-		rxByte = Wire.read(); // Read the value.
-	}
-	else {
-		rxByte = -1; // Returns -1 if fails.
-	}
-	return rxByte;
-}
-
-// Function to write values to an I2C address
-bool AD5933_Class::setByte(int address, int value) // variables are "address & value" OR "command code & address"
-{
-	Wire.beginTransmission(AD5933_ADR); // Begin I2C Transmission.
-	Wire.write(address); // Write Address
-	Wire.write(value); // Write Value
-	int i2cReturn = Wire.endTransmission(); // Terminate the transmission.
-
-	if (i2cReturn)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
-
-// Reads a block of data from the AD5933
-bool AD5933_Class::blockRead(int address, int num2Read, byte *toSave)
-{
-	if ( !AD5933.setByte(Address_Ptr, address) )
-		return false;
-	if ( !AD5933.setByte(BLOCK_READ_CODE, num2Read) )
-		return false;
-
-	for (byte t1 = 0; t1 < num2Read; t1++)
-	{
-		Wire.requestFrom(AD5933_ADR, 1); // Request the value of the written address.
-
-		if (1 <= Wire.available()) { // If the MCU get the value,
-			toSave[t1] = Wire.read(); // Read the value.
-		}
-		else {
-			toSave[t1] = -1; // Returns -1 if fails.
-			return false;
-
-		}
-	}
-	return true;
 }
